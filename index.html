@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="План недели">
+<meta name="theme-color" content="#0e0e12">
+<title>План недели — Иван</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Inter:wght@300;400;500;600&display=swap');
+:root{--bg:#0e0e12;--surface:#16161e;--surface2:#1e1e2a;--border:#2a2a3a;--accent:#6c63ff;--accent2:#ff6584;--gold:#f5c842;--green:#3dffa0;--text:#e8e8f0;--muted:#7070a0;--r:14px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:20px 14px 80px;max-width:600px;margin:0 auto}
+.hdr{text-align:center;margin-bottom:28px;padding-top:8px}
+.hdr-eye{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.hdr h1{font-family:'Unbounded',sans-serif;font-size:clamp(22px,7vw,40px);font-weight:900;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.hdr-sub{font-size:13px;color:var(--muted);font-weight:300}
+.prog{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px}
+.prog-lbl{font-size:11px;color:var(--muted);white-space:nowrap;font-weight:500}
+.prog-track{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .4s ease}
+.prog-pct{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--green);white-space:nowrap}
+.sec{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:24px 0 12px 2px}
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.gc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s;user-select:none}
+.gc:active{opacity:.8}
+.gc.done{background:rgba(61,255,160,.06);border-color:var(--green)}
+.gc.done .gc-txt{text-decoration:line-through;color:var(--muted)}
+.gc-box{width:20px;height:20px;border:1.5px solid var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
+.gc.done .gc-box{background:var(--green);border-color:var(--green)}
+.gc-tick{display:none;font-size:11px;color:#0e0e12;font-weight:900}
+.gc.done .gc-tick{display:block}
+.gc-n{font-family:'Unbounded',sans-serif;font-size:9px;color:var(--accent);margin-bottom:3px;font-weight:700}
+.gc-txt{font-size:12px;font-weight:500;line-height:1.35}
+.streaks{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.si{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.si-icon{font-size:18px}
+.si-info{flex:1}
+.si-name{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px}
+.si-dots{display:flex;gap:5px}
+.sdot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:background .15s}
+.sdot.on{background:var(--green)}
+.days{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.dc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.dc-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:10px;user-select:none}
+.dc-hdr:active{opacity:.8}
+.dc-left{flex:1}
+.dc-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700}
+.dc-date{font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+.dc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.dtag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;letter-spacing:.04em}
+.tw{background:rgba(108,99,255,.15);color:var(--accent)}
+.tt{background:rgba(245,200,66,.15);color:var(--gold)}
+.tr{background:rgba(61,255,160,.12);color:var(--green)}
+.tb{background:rgba(255,101,132,.15);color:var(--accent2)}
+.trv{background:rgba(255,255,255,.07);color:var(--muted)}
+.dc-right{display:flex;align-items:center;gap:8px}
+.dc-cnt{font-size:11px;color:var(--muted);font-weight:500}
+.dc-chev{color:var(--muted);font-size:20px;transition:transform .25s}
+.dc.open .dc-chev{transform:rotate(180deg)}
+.dc-body{display:none;border-top:1px solid var(--border)}
+.dc.open .dc-body{display:block}
+.tsec{padding:10px 16px 0}
+.tsec-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:2px}
+.task{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;user-select:none}
+.task:last-child{border-bottom:none}
+.task:active{opacity:.7}
+.tcb{width:17px;height:17px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .15s}
+.task.done .tcb{background:var(--green);border-color:var(--green)}
+.ttick{display:none;font-size:9px;color:#0e0e12;font-weight:900}
+.task.done .ttick{display:block}
+.tem{font-size:13px;flex-shrink:0;margin-top:1px}
+.tbody{flex:1}
+.tlbl{font-size:13px;line-height:1.35}
+.task.done .tlbl{text-decoration:line-through;color:var(--muted)}
+.ttime{font-size:10px;color:var(--accent);font-weight:600;margin-top:2px}
+.notes-wrap{padding:10px 16px 14px}
+.notes-lbl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.notes-ta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;resize:vertical;min-height:64px;outline:none;transition:border-color .15s;line-height:1.5}
+.notes-ta:focus{border-color:var(--accent)}
+.notes-ta::placeholder{color:var(--muted)}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.ins{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.ins-icon{font-size:20px;margin-bottom:8px}
+.ins-title{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.ins-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.ins-list li{font-size:11px;color:var(--text);line-height:1.35;padding-left:14px;position:relative}
+.ins-list li::before{position:absolute;left:0;font-size:10px}
+.yes li::before{color:var(--green);content:'→'}
+.no li::before{color:var(--accent2);content:'✕'}
+.rev-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:24px}
+.rev-hint{font-size:12px;color:var(--muted);margin-bottom:14px}
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rev-field label{display:block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.rev-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;min-height:72px;outline:none;transition:border-color .15s;line-height:1.5}
+.rev-field textarea:focus{border-color:var(--accent)}
+.rev-field textarea::placeholder{color:var(--muted)}
+.save-btn{display:block;width:100%;padding:15px;background:linear-gradient(135deg,var(--accent),#9c63ff);border:none;border-radius:var(--r);color:white;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:.05em;cursor:pointer;transition:opacity .15s,transform .1s;margin-bottom:10px}
+.save-btn:active{transform:scale(.98)}
+.save-hint{text-align:center;font-size:11px;color:var(--muted)}
+@media(max-width:380px){.goals{grid-template-columns:1fr}.ins-grid{grid-template-columns:1fr}.rev-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-eye">Планирование по Кови · Неделя 1</div>
+  <h1>ПЛАН НЕДЕЛИ</h1>
+  <div class="hdr-sub">30 июня — 6 июля · Иван Дорофеев</div>
+</div>
+
+<div class="prog">
+  <div class="prog-lbl">прогресс</div>
+  <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+  <div class="prog-pct" id="pp">0%</div>
+</div>
+
+<div class="sec">ежедневные привычки</div>
+<div class="streaks" id="streaks"></div>
+
+<div class="sec">главные цели недели</div>
+<div class="goals" id="goals"></div>
+
+<div class="sec">по дням</div>
+<div class="days" id="days"></div>
+
+<div class="sec">фокус</div>
+<div class="ins-grid">
+  <div class="ins">
+    <div class="ins-icon">⚡</div>
+    <div class="ins-title">20% → 80%</div>
+    <ul class="ins-list yes">
+      <li>Звонки в power hour каждый день</li>
+      <li>Чтение Кови + задания</li>
+      <li>Голос перед сном</li>
+    </ul>
+  </div>
+  <div class="ins">
+    <div class="ins-icon">🚫</div>
+    <div class="ins-title">не делать</div>
+    <ul class="ins-list no">
+      <li>Не лезть в тему бизнеса</li>
+      <li>Не добавлять новые книги</li>
+      <li>Не скроллить без минимума</li>
+      <li>Не пропускать голос</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec">обзор недели (воскресенье)</div>
+<div class="rev-card">
+  <div class="rev-hint">заполни в конце недели</div>
+  <div class="rev-grid">
+    <div class="rev-field"><label>что получилось?</label><textarea id="r1" placeholder="Напиши честно..."></textarea></div>
+    <div class="rev-field"><label>что не получилось?</label><textarea id="r2" placeholder="Только факты..."></textarea></div>
+    <div class="rev-field"><label>привычки укрепились?</label><textarea id="r3" placeholder="Что стало легче?"></textarea></div>
+    <div class="rev-field"><label>что изменить?</label><textarea id="r4" placeholder="1–3 вещи..."></textarea></div>
+  </div>
+</div>
+
+<button class="save-btn" id="sbtn" onclick="saveAll()">💾 Сохранить прогресс</button>
+<div class="save-hint">автосохранение при каждом нажатии</div>
+
+<script>
+const DL=['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+const SK='ivan-week-v3';
+
+const goals=[
+  {id:'g1',text:'2 заявки в компанию'},
+  {id:'g2',text:'120 звонков за неделю'},
+  {id:'g3',text:'Дочитать Кови + задания'},
+  {id:'g4',text:'3 тренировки + прогресс'},
+  {id:'g5',text:'Калории ≤1500 (кроме вт)'},
+  {id:'g6',text:'Голос — без пропусков'},
+];
+
+const streaks=[
+  {id:'zar',icon:'🏋️',name:'Зарядка'},
+  {id:'voice',icon:'🎙️',name:'Голос'},
+  {id:'read',icon:'📖',name:'Чтение 30 мин'},
+  {id:'vit',icon:'💊',name:'Витамин Д + креатин'},
+  {id:'cal',icon:'🥗',name:'Калории ≤1500'},
+];
+
+const days=[
+  {id:'mon',name:'Понедельник',date:'30 июня',tags:[{c:'tw',t:'Работа'},{c:'tt',t:'Тренировка'}],sections:[
+    {lbl:'Утро',tasks:[{id:'m1',time:'08:00',em:'⚡',text:'Зарядка + холодный душ'},{id:'m2',time:'08:15',em:'💊',text:'Витамин Д + креатин'}]},
+    {lbl:'Работа · 10:00–17:00',tasks:[{id:'m3',time:'10:00–12:00',em:'📞',text:'Power Hour №1 — 15 звонков'},{id:'m4',time:'12:30–14:30',em:'📞',text:'Power Hour №2 — 15 звонков (итого 30)'},{id:'m5',time:'14:30–17:00',em:'🗂️',text:'CRM: 2–3 перспективных лида'}]},
+    {lbl:'Вечер',tasks:[{id:'m6',time:'19:30',em:'📚',text:'Кови 30 мин + выбрать задание на неделю'},{id:'m7',time:'~20:00',em:'🏋️',text:'Тренировка — записать веса'},{id:'m8',time:'23:00',em:'🎙️',text:'Голос: 5 мин разогрев + 15 мин вслух'}]},
+  ]},
+  {id:'tue',name:'Вторник',date:'1 июля',tags:[{c:'tw',t:'Работа'},{c:'tb',t:'День рождения'}],sections:[
+    {lbl:'Утро',tasks:[{id:'t1',time:'08:00',em:'⚡',text:'Зарядка + холодный душ'},{id:'t2',time:'08:15',em:'💊',text:'Витамин Д + креатин'}]},
+    {lbl:'Работа · 10:00–17:00',tasks:[{id:'t3',time:'10:00–12:00',em:'📞',text:'Power Hour №1 — 15 звонков'},{id:'t4',time:'12:30–14:30',em:'📞',text:'Power Hour №2 — 15 звонков'},{id:'t5',time:'14:30–17:00',em:'🗂️',text:'CRM + задание из Кови'}]},
+    {lbl:'Вечер',tasks:[{id:'t6',time:'19:30',em:'📚',text:'Кови 30 мин'},{id:'t7',time:'~21:00',em:'🎂',text:'День рождения друга — быть здесь'},{id:'t8',time:'23:00',em:'🎙️',text:'Голос (можно 10 мин)'}]},
+  ]},
+  {id:'wed',name:'Среда',date:'2 июля',tags:[{c:'tw',t:'Работа'},{c:'tt',t:'Тренировка'}],sections:[
+    {lbl:'Утро',tasks:[{id:'w1',time:'08:00',em:'⚡',text:'Зарядка + холодный душ'},{id:'w2',time:'08:15',em:'💊',text:'Витамин Д + креатин'}]},
+    {lbl:'Работа · 10:00–17:00',tasks:[{id:'w3',time:'10:00–12:00',em:'📞',text:'Power Hour №1 — 15 звонков'},{id:'w4',time:'12:30–14:30',em:'📞',text:'Power Hour №2 — фокус на ответивших'},{id:'w5',time:'14:30–17:00',em:'🗂️',text:'CRM + мини-обзор темпа'}]},
+    {lbl:'Вечер',tasks:[{id:'w6',time:'19:30',em:'📚',text:'Кови 30 мин'},{id:'w7',time:'~20:00',em:'🏋️',text:'Тренировка — записать прогресс'},{id:'w8',time:'23:00',em:'🎙️',text:'Голос: 5 мин разогрев + 15 мин вслух'}]},
+  ]},
+  {id:'thu',name:'Четверг',date:'3 июля',tags:[{c:'tw',t:'Работа'}],sections:[
+    {lbl:'Утро',tasks:[{id:'th1',time:'08:00',em:'⚡',text:'Зарядка + холодный душ'},{id:'th2',time:'08:15',em:'💊',text:'Витамин Д + креатин'}]},
+    {lbl:'Работа · 10:00–17:00',tasks:[{id:'th3',time:'10:00–12:00',em:'📞',text:'Power Hour №1 — 15 звонков'},{id:'th4',time:'12:30–14:30',em:'📞',text:'Power Hour №2 — работа с заинтересованными'},{id:'th5',time:'14:30–17:00',em:'🗂️',text:'CRM + Задание Кови №2'}]},
+    {lbl:'Вечер',tasks:[{id:'th6',time:'19:00',em:'💑',text:'Время для девушки — без телефона'},{id:'th7',time:'21:00',em:'📚',text:'Кови 30 мин'},{id:'th8',time:'23:00',em:'🎙️',text:'Голос: 5 мин разогрев + 15 мин вслух'}]},
+  ]},
+  {id:'fri',name:'Пятница',date:'4 июля',tags:[{c:'tw',t:'Работа'},{c:'tt',t:'Тренировка'}],sections:[
+    {lbl:'Утро',tasks:[{id:'f1',time:'08:00',em:'⚡',text:'Зарядка + холодный душ'},{id:'f2',time:'08:15',em:'💊',text:'Витамин Д + креатин'}]},
+    {lbl:'Работа · 10:00–17:00',tasks:[{id:'f3',time:'10:00–12:00',em:'📞',text:'Power Hour №1 — дожать 1 заявку'},{id:'f4',time:'12:30–14:30',em:'📞',text:'Power Hour №2 — 10–15 звонков'},{id:'f5',time:'14:30–17:00',em:'📋',text:'Закрыть все задания Кови'}]},
+    {lbl:'Вечер',tasks:[{id:'f6',time:'19:30',em:'📚',text:'Дочитать книгу — 30 мин'},{id:'f7',time:'~20:30',em:'🏋️',text:'Тренировка №3 — прогресс в весах'},{id:'f8',time:'23:00',em:'🎙️',text:'Голос + запись на диктофон 2–3 мин'}]},
+  ]},
+  {id:'sat',name:'Суббота',date:'5 июля',tags:[{c:'tr',t:'Отдых'}],sections:[
+    {lbl:'День',tasks:[{id:'s1',time:'Утро',em:'⚡',text:'Зарядка + витамин Д + креатин'},{id:'s2',time:'Утро',em:'📝',text:'Выводы из Кови — 1 страница от руки'},{id:'s3',time:'День',em:'🏋️',text:'Тренировка (если перенесена)'}]},
+    {lbl:'Вечер',tasks:[{id:'s4',time:'19:30',em:'📚',text:'Чтение 30 мин'},{id:'s5',time:'23:00',em:'🎙️',text:'Голос перед сном'},{id:'s6',time:'Вечер',em:'💑',text:'Качественное время — девушка / друзья'}]},
+  ]},
+  {id:'sun',name:'Воскресенье',date:'6 июля',tags:[{c:'trv',t:'Обзор'}],sections:[
+    {lbl:'День',tasks:[{id:'su1',time:'Утро',em:'⚡',text:'Зарядка + витамин Д + креатин'},{id:'su2',time:'День',em:'🔍',text:'Обзор недели — заполнить блок выше'},{id:'su3',time:'День',em:'📅',text:'Составить план на следующую неделю'}]},
+    {lbl:'Вечер',tasks:[{id:'su4',time:'19:30',em:'📚',text:'Чтение 30 мин'},{id:'su5',time:'23:00',em:'🎙️',text:'Голос перед сном'},{id:'su6',time:'Вечер',em:'🌙',text:'Лёгкий отдых — подготовка к новой неделе'}]},
+  ]},
+];
+
+let S={};
+function load(){try{const r=localStorage.getItem(SK);if(r)S=JSON.parse(r);}catch(e){S={};}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}}
+
+function renderGoals(){
+  const g=document.getElementById('goals');g.innerHTML='';
+  goals.forEach((gl,i)=>{
+    const done=!!S[gl.id];
+    const d=document.createElement('div');
+    d.className='gc'+(done?' done':'');
+    d.innerHTML=`<div class="gc-box"><span class="gc-tick">✓</span></div><div><div class="gc-n">ЦЕЛЬ ${String(i+1).padStart(2,'0')}</div><div class="gc-txt">${gl.text}</div></div>`;
+    d.onclick=()=>{S[gl.id]=!S[gl.id];save();renderGoals();updateProg();};
+    g.appendChild(d);
+  });
+}
+
+function renderStreaks(){
+  const r=document.getElementById('streaks');r.innerHTML='';
+  streaks.forEach(s=>{
+    const el=document.createElement('div');el.className='si';
+    const dots=DL.map((d,i)=>{const k='h_'+s.id+'_'+i;return`<div class="sdot${S[k]?' on':''}" data-k="${k}" title="${d}"></div>`;}).join('');
+    el.innerHTML=`<div class="si-icon">${s.icon}</div><div class="si-info"><div class="si-name">${s.name}</div><div class="si-dots">${dots}</div></div>`;
+    el.querySelectorAll('.sdot').forEach(dot=>{dot.onclick=()=>{S[dot.dataset.k]=!S[dot.dataset.k];save();renderStreaks();};});
+    r.appendChild(el);
+  });
+}
+
+function renderDays(){
+  const dl=document.getElementById('days');dl.innerHTML='';
+  days.forEach(day=>{
+    const allT=day.sections.flatMap(s=>s.tasks);
+    const doneT=allT.filter(t=>S[t.id]).length;
+    const open=!!S['op_'+day.id];
+    const card=document.createElement('div');
+    card.className='dc'+(open?' open':'');
+    const tags=day.tags.map(t=>`<span class="dtag ${t.c}">${t.t}</span>`).join('');
+    const secs=day.sections.map(sec=>`
+      <div class="tsec">
+        <div class="tsec-lbl">${sec.lbl}</div>
+        ${sec.tasks.map(task=>`
+          <div class="task${S[task.id]?' done':''}" data-id="${task.id}">
+            <div class="tcb"><span class="ttick">✓</span></div>
+            <div class="tem">${task.em}</div>
+            <div class="tbody"><div class="tlbl">${task.text}</div><div class="ttime">${task.time}</div></div>
+          </div>`).join('')}
+      </div>`).join('');
+    card.innerHTML=`
+      <div class="dc-hdr">
+        <div class="dc-left">
+          <div class="dc-name">${day.name}</div>
+          <div class="dc-date">${day.date}</div>
+          <div class="dc-tags">${tags}</div>
+        </div>
+        <div class="dc-right">
+          <span class="dc-cnt">${doneT}/${allT.length}</span>
+          <span class="dc-chev">▾</span>
+        </div>
+      </div>
+      <div class="dc-body">
+        ${secs}
+        <div class="notes-wrap">
+          <div class="notes-lbl">заметки дня</div>
+          <textarea class="notes-ta" placeholder="Как прошёл день..." data-note="${day.id}">${S['n_'+day.id]||''}</textarea>
+        </div>
+      </div>`;
+    card.querySelector('.dc-hdr').onclick=()=>{S['op_'+day.id]=!S['op_'+day.id];save();renderDays();};
+    card.querySelectorAll('.task').forEach(el=>{
+      el.onclick=e=>{e.stopPropagation();S[el.dataset.id]=!S[el.dataset.id];save();renderDays();updateProg();};
+    });
+    let nt;
+    card.querySelector('textarea[data-note]').oninput=e=>{S['n_'+day.id]=e.target.value;clearTimeout(nt);nt=setTimeout(save,600);};
+    dl.appendChild(card);
+  });
+}
+
+function updateProg(){
+  const ag=goals.length,dg=goals.filter(g=>S[g.id]).length;
+  const at=days.flatMap(d=>d.sections.flatMap(s=>s.tasks)).length;
+  const dt=days.flatMap(d=>d.sections.flatMap(s=>s.tasks)).filter(t=>S[t.id]).length;
+  const pct=Math.round((dg+dt)/(ag+at)*100);
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pp').textContent=pct+'%';
+}
+
+function loadReview(){
+  ['r1','r2','r3','r4'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.value=S[id]||'';
+    let t;el.oninput=()=>{S[id]=el.value;clearTimeout(t);t=setTimeout(save,600);};
+  });
+}
+
+function saveAll(){
+  save();
+  const btn=document.getElementById('sbtn');
+  btn.textContent='✅ Сохранено!';
+  setTimeout(()=>{btn.textContent='💾 Сохранить прогресс';},2000);
+}
+
+load();renderGoals();renderStreaks();renderDays();loadReview();updateProg();
+</script>
+</body>
+</html>
